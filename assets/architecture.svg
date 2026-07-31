@@ -41,17 +41,17 @@
 
   <text class="eyebrow" x="80" y="72">AGENTIC INCIDENT MEMORY</text>
   <text class="title" x="80" y="130">How RecallOps turns every resolution into reusable evidence</text>
-  <text class="subtitle" x="80" y="170">Target runtime: AWS ECS Fargate · Persistent memory: CockroachDB Cloud · Reasoning: Amazon Bedrock</text>
+  <text class="subtitle" x="80" y="170">Target runtime: AWS ECS Fargate | Persistent memory: CockroachDB Cloud | Reasoning: Amazon Bedrock</text>
 
   <g filter="url(#shadow)">
     <rect x="80" y="250" width="260" height="390" rx="28" fill="#111a38" stroke="#344875" stroke-width="2"/>
     <circle cx="130" cy="305" r="23" fill="#ffb45b"/>
     <text class="step" x="124" y="312">1</text>
     <text class="box-title" x="170" y="313">Operator console</text>
-    <text class="box-copy" x="110" y="365">Create an incident with:</text>
-    <text class="box-copy" x="125" y="402">• service + symptoms</text>
-    <text class="box-copy" x="125" y="435">• infrastructure context</text>
-    <text class="box-copy" x="125" y="468">• resolution + outcome</text>
+    <text class="box-copy" x="110" y="365">Record an incident with:</text>
+    <text class="box-copy" x="125" y="402">- service + symptoms</text>
+    <text class="box-copy" x="125" y="435">- infrastructure context</text>
+    <text class="label" x="110" y="478">Then capture resolution + outcome</text>
     <rect x="110" y="520" width="200" height="72" rx="16" fill="#17264d"/>
     <text class="chip" x="134" y="550">HUMAN-IN-THE-LOOP</text>
     <text class="box-copy" x="134" y="576">No automatic remediation</text>
@@ -70,7 +70,7 @@
     <text class="box-copy" x="510" y="437">Incident + evidence commit</text>
     <rect x="485" y="470" width="230" height="62" rx="15" fill="#101d4e" opacity="0.75"/>
     <text class="chip" x="510" y="496">RESOLVED-ONLY RECALL</text>
-    <text class="box-copy" x="510" y="519">Same service · thresholded</text>
+    <text class="box-copy" x="510" y="519">Same service - thresholded</text>
     <rect x="485" y="552" width="230" height="72" rx="15" fill="#101d4e" opacity="0.75"/>
     <text class="chip" x="510" y="578">GROUNDED RESPONSE</text>
     <text class="box-copy" x="510" y="601">Evidence IDs + uncertainty</text>
@@ -83,15 +83,15 @@
     <rect x="880" y="215" width="640" height="270" rx="28" fill="url(#memory)" stroke="#5c72d9" stroke-width="2"/>
     <circle cx="930" cy="272" r="23" fill="#7ef2e5"/>
     <text class="step" x="924" y="279">3</text>
-    <text class="box-title" x="970" y="280">CockroachDB Cloud — durable agent memory</text>
+    <text class="box-title" x="970" y="280">CockroachDB Cloud - durable agent memory</text>
     <rect x="920" y="325" width="170" height="105" rx="18" fill="#0b1736" opacity="0.82"/>
     <text class="chip" x="945" y="357">INCIDENTS</text>
-    <text class="box-copy" x="945" y="385">state · service</text>
+    <text class="box-copy" x="945" y="385">state - service</text>
     <text class="box-copy" x="945" y="410">infrastructure</text>
     <rect x="1110" y="325" width="180" height="105" rx="18" fill="#0b1736" opacity="0.82"/>
     <text class="chip" x="1135" y="357">MEMORY EVENTS</text>
-    <text class="box-copy" x="1135" y="385">symptom · resolution</text>
-    <text class="box-copy" x="1135" y="410">outcome · provenance</text>
+    <text class="box-copy" x="1135" y="385">symptom - resolution</text>
+    <text class="box-copy" x="1135" y="410">outcome - provenance</text>
     <rect x="1310" y="325" width="170" height="105" rx="18" fill="#0b1736" opacity="0.82"/>
     <text class="chip" x="1335" y="357">VECTOR(512)</text>
     <text class="box-copy" x="1335" y="385">distributed ANN</text>
@@ -119,9 +119,10 @@
   </g>
 
   <path class="feedback" d="M 1370 705 C 1370 805, 690 820, 600 660"/>
-  <text class="label" x="840" y="824">Recorded resolution + outcome close the feedback loop for the next incident</text>
+  <text class="label" x="840" y="872">Recorded resolution + outcome close the feedback loop for the next incident</text>
 
-  <rect x="80" y="748" width="590" height="82" rx="20" fill="#0d1630" stroke="#2b3b68"/>
+  <rect x="80" y="748" width="660" height="102" rx="20" fill="#0d1630" stroke="#2b3b68"/>
   <text class="chip" x="110" y="780">VISIBLE PROOF IN EVERY RESPONSE</text>
-  <text class="box-copy" x="110" y="808">relevance · matched terms · resolution · recorded outcome · memory IDs · MCP status</text>
+  <text class="box-copy" x="110" y="808">relevance - matched terms - resolution - recorded outcome</text>
+  <text class="box-copy" x="110" y="833">memory IDs - source IDs - timestamps - MCP status</text>
 </svg>
