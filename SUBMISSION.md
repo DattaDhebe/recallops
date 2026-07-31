@@ -1,6 +1,6 @@
 # RecallOps Devpost submission draft
 
-This file contains paste-ready fields plus explicit status notes. Replace every bracketed placeholder and complete every live-verification item before submitting. The repository implements the local workflow and cloud integration code paths, but this draft does not claim that a public AWS deployment, CockroachDB Cloud connection, Bedrock request, or Managed MCP request is already live.
+This file contains paste-ready fields plus explicit status notes. Complete every live-verification item before submitting. The repository implements the local workflow and cloud integration code paths, but this draft does not claim that a public AWS deployment, CockroachDB Cloud connection, Bedrock request, or Managed MCP request is already live.
 
 ## Project name
 
@@ -181,13 +181,14 @@ Record this only after the public deployment, CockroachDB Cloud vector path, Bed
 
 ### Submission assets
 
-- [ ] Public source repository URL added.
-- [ ] Root MIT license visible in the public repository.
+- [x] Public source repository URL added.
+- [x] Root MIT license visible in the public repository.
 - [ ] Public AWS demo URL added and available for the full judging period.
 - [ ] Public YouTube/Vimeo video is under three minutes.
 - [ ] Video visibly proves vector retrieval, Bedrock reasoning, and the MCP audit.
-- [ ] Generated cover, architecture image, UI screenshot, and memory/audit evidence uploaded.
-- [ ] Devpost project name changed from any earlier draft name to RecallOps.
+- [x] Cover and architecture assets are present in the draft.
+- [ ] Deployed UI screenshot and CockroachDB memory/MCP evidence uploaded.
+- [x] Devpost project name changed from any earlier draft name to RecallOps.
 - [ ] Devpost text matches the final deployed behavior and services.
 - [ ] Every placeholder removed.
 - [ ] Entrant completed all personal and legal attestations.

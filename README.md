@@ -126,7 +126,7 @@ $currentIncident = Invoke-RestMethod -Method Post -Uri "$recallOpsBase/incidents
 $recommendation = Invoke-RestMethod -Method Post -Uri "$recallOpsBase/incidents/$($currentIncident.id)/investigate" -Headers $requestHeaders
 $recommendation | ConvertTo-Json -Depth 10
 
-Invoke-RestMethod -Method Get -Uri "$recallOpsBase/incidents/$($priorIncident.id)/memory" | ConvertTo-Json -Depth 10
+Invoke-RestMethod -Method Get -Uri "$recallOpsBase/incidents/$($priorIncident.id)/memory" -Headers $requestHeaders | ConvertTo-Json -Depth 10
 Invoke-RestMethod -Method Get -Uri "$recallOpsBase/system" | ConvertTo-Json -Depth 10
 ```
 
@@ -231,7 +231,7 @@ Those templates are not evidence that AWS resources exist. Add ECS/Fargate, ALB,
 
 ## Submission materials
 
-- [SUBMISSION.md](SUBMISSION.md) - Devpost-ready fields, truthful status language, required URL placeholders, video script, and final checklist.
+- [SUBMISSION.md](SUBMISSION.md) - Devpost-ready fields, truthful status language, required URLs, video script, and final checklist.
 - [ARCHITECTURE.md](ARCHITECTURE.md) - detailed memory lifecycle, retrieval constraints, MCP safety, and deployment boundaries.
 - [LICENSE](LICENSE) - MIT license.
 - [Devpost cover](assets/devpost-cover.png) - generated 16:9 project gallery asset.

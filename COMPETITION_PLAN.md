@@ -43,8 +43,8 @@ Do not submit while any mandatory item is unchecked.
 | --- | --- | --- | --- |
 | P0 | Managed MCP is integrated but not live-verified | Automatic Stage One failure if the live demo does not prove it | Configure the read-only service account, exercise the integrated audit against CockroachDB Cloud, and show its receipt in the video |
 | P0 | No verified AWS deployment | The challenge requires deployment on AWS | Public HTTPS endpoint runs the production configuration and passes an end-to-end smoke test |
-| P0 | No live demo or video URLs | Required submission deliverables | Add a public AWS demo URL and a public YouTube/Vimeo video URL to Devpost |
-| P0 | No public demo video | Required submission deliverable | Public YouTube/Vimeo video is under 3:00 and shows vector memory plus MCP audit |
+| P0 | No live demo URL | Required submission deliverable | Add a public AWS demo URL to Devpost and keep it available through judging |
+| P0 | No public demo video | Required submission deliverable | Publish a YouTube/Vimeo video under 3:00 showing vector memory plus MCP audit |
 | Done | Devpost and product naming diverged | Confusing and weakens credibility | Devpost, repository, UI, and generated assets now use RecallOps |
 | Done | Saved Devpost story described a generic planned system | Claims did not match the working product | Project story now describes the implemented incident-response memory loop |
 | Done | Incident and memory writes were not atomic | Contradicted readiness claims | One transaction now commits state plus all related memory events, with rollback tests |
