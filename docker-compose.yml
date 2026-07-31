@@ -1,0 +1,52 @@
+services:
+  cockroach:
+    image: cockroachdb/cockroach:v25.2.4
+    command: start-single-node --insecure
+    ports:
+      - "127.0.0.1:26257:26257"
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - cockroach-data:/cockroach/cockroach-data
+    healthcheck:
+      test: ["CMD", "cockroach", "node", "status", "--insecure", "--host=localhost:26257"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  cockroach-init:
+    image: cockroachdb/cockroach:v25.2.4
+    depends_on:
+      cockroach:
+        condition: service_healthy
+    entrypoint: ["cockroach", "sql", "--insecure", "--host=cockroach:26257", "--execute", "SET CLUSTER SETTING feature.vector_index.enabled = true;"]
+
+  api:
+    build: .
+    depends_on:
+      cockroach-init:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgresql://root@cockroach:26257/defaultdb?sslmode=disable
+      REQUIRE_COCKROACHDB: "true"
+      COMPETITION_MODE: "false"
+      USE_BEDROCK: ${USE_BEDROCK:-false}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-amazon.nova-lite-v1:0}
+      BEDROCK_EMBEDDING_MODEL_ID: ${BEDROCK_EMBEDDING_MODEL_ID:-amazon.titan-embed-text-v2:0}
+      MINIMUM_RELEVANCE: ${MINIMUM_RELEVANCE:-0.15}
+      USE_COCKROACH_MCP: ${USE_COCKROACH_MCP:-false}
+      COCKROACH_MCP_URL: ${COCKROACH_MCP_URL:-https://cockroachlabs.cloud/mcp}
+      COCKROACH_MCP_API_KEY: ${COCKROACH_MCP_API_KEY:-}
+      COCKROACH_MCP_CLUSTER_ID: ${COCKROACH_MCP_CLUSTER_ID:-}
+      COCKROACH_MCP_DATABASE: ${COCKROACH_MCP_DATABASE:-defaultdb}
+      API_KEY: ${API_KEY:-}
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+volumes:
+  cockroach-data:

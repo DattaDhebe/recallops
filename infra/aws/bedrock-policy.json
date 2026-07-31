@@ -1,0 +1,16 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "InvokeOnlyConfiguredFoundationModels",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:<AWS_REGION>::foundation-model/amazon.nova-lite-v1:0",
+        "arn:aws:bedrock:<AWS_REGION>::foundation-model/amazon.titan-embed-text-v2:0"
+      ]
+    }
+  ]
+}

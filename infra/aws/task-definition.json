@@ -1,0 +1,152 @@
+{
+  "family": "recallops",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "<ECS_TASK_EXECUTION_ROLE_ARN>",
+  "taskRoleArn": "<ECS_TASK_ROLE_ARN>",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "containerDefinitions": [
+    {
+      "name": "recallops",
+      "image": "<AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/recallops:<IMMUTABLE_IMAGE_TAG>",
+      "essential": true,
+      "user": "recallops",
+      "readonlyRootFilesystem": true,
+      "portMappings": [
+        {
+          "name": "http",
+          "containerPort": 8000,
+          "hostPort": 8000,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "environment": [
+        {
+          "name": "APP_NAME",
+          "value": "RecallOps"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "<AWS_REGION>"
+        },
+        {
+          "name": "BEDROCK_MODEL_ID",
+          "value": "amazon.nova-lite-v1:0"
+        },
+        {
+          "name": "BEDROCK_EMBEDDING_MODEL_ID",
+          "value": "amazon.titan-embed-text-v2:0"
+        },
+        {
+          "name": "EMBEDDING_DIMENSIONS",
+          "value": "512"
+        },
+        {
+          "name": "USE_BEDROCK",
+          "value": "true"
+        },
+        {
+          "name": "REQUIRE_COCKROACHDB",
+          "value": "true"
+        },
+        {
+          "name": "COMPETITION_MODE",
+          "value": "true"
+        },
+        {
+          "name": "USE_COCKROACH_MCP",
+          "value": "true"
+        },
+        {
+          "name": "COCKROACH_MCP_URL",
+          "value": "https://cockroachlabs.cloud/mcp"
+        },
+        {
+          "name": "COCKROACH_MCP_DATABASE",
+          "value": "<COCKROACH_DATABASE_NAME>"
+        },
+        {
+          "name": "COCKROACH_MCP_TIMEOUT_SECONDS",
+          "value": "20"
+        },
+        {
+          "name": "CORS_ORIGINS",
+          "value": "<HTTPS_APPLICATION_ORIGIN>"
+        },
+        {
+          "name": "PYTHONDONTWRITEBYTECODE",
+          "value": "1"
+        },
+        {
+          "name": "PYTHONUNBUFFERED",
+          "value": "1"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "<DATABASE_URL_SECRET_ARN>"
+        },
+        {
+          "name": "API_KEY",
+          "valueFrom": "<API_KEY_SECRET_ARN>"
+        },
+        {
+          "name": "COCKROACH_MCP_API_KEY",
+          "valueFrom": "<COCKROACH_MCP_API_KEY_SECRET_ARN>"
+        },
+        {
+          "name": "COCKROACH_MCP_CLUSTER_ID",
+          "valueFrom": "<COCKROACH_MCP_CLUSTER_ID_PARAMETER_ARN>"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=3)\" || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "linuxParameters": {
+        "initProcessEnabled": true
+      },
+      "ulimits": [
+        {
+          "name": "nofile",
+          "softLimit": 65536,
+          "hardLimit": 65536
+        }
+      ],
+      "stopTimeout": 30,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "<CLOUDWATCH_LOG_GROUP>",
+          "awslogs-region": "<AWS_REGION>",
+          "awslogs-stream-prefix": "recallops"
+        }
+      }
+    }
+  ],
+  "tags": [
+    {
+      "key": "Project",
+      "value": "RecallOps"
+    },
+    {
+      "key": "ManagedBy",
+      "value": "manual-template"
+    }
+  ]
+}
