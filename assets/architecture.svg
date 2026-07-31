@@ -54,11 +54,11 @@
     <text class="label" x="110" y="478">Then capture resolution + outcome</text>
     <rect x="110" y="510" width="240" height="82" rx="16" fill="#17264d" stroke="#ffb45b" stroke-width="2"/>
     <text class="chip" x="134" y="550">HUMAN APPROVAL GATE</text>
-    <text class="box-copy" x="134" y="575">Operator reviews before action</text>
+    <text class="box-copy" x="134" y="575">Operator approval required</text>
   </g>
 
   <path class="arrow" d="M 380 445 C 405 445, 420 445, 448 445"/>
-  <path class="arrow" d="M 485 588 C 430 585, 395 550, 350 530"/>
+  <path class="arrow" d="M 485 588 C 430 585, 395 550, 350 520"/>
 
   <g filter="url(#shadow)">
     <rect x="450" y="230" width="300" height="430" rx="28" fill="url(#agent)" opacity="0.96"/>
