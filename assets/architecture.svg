@@ -44,7 +44,7 @@
   <text class="subtitle" x="80" y="170">Target runtime: AWS ECS Fargate | Persistent memory: CockroachDB Cloud | Reasoning: Amazon Bedrock</text>
 
   <g filter="url(#shadow)">
-    <rect x="80" y="250" width="260" height="390" rx="28" fill="#111a38" stroke="#344875" stroke-width="2"/>
+    <rect x="80" y="250" width="300" height="390" rx="28" fill="#111a38" stroke="#344875" stroke-width="2"/>
     <circle cx="130" cy="305" r="23" fill="#ffb45b"/>
     <text class="step" x="124" y="312">1</text>
     <text class="box-title" x="170" y="313">Operator console</text>
@@ -52,12 +52,12 @@
     <text class="box-copy" x="125" y="402">- service + symptoms</text>
     <text class="box-copy" x="125" y="435">- infrastructure context</text>
     <text class="label" x="110" y="478">Then capture resolution + outcome</text>
-    <rect x="110" y="520" width="200" height="72" rx="16" fill="#17264d"/>
-    <text class="chip" x="134" y="550">HUMAN-IN-THE-LOOP</text>
-    <text class="box-copy" x="134" y="576">No automatic remediation</text>
+    <rect x="110" y="510" width="240" height="82" rx="16" fill="#17264d"/>
+    <text class="chip" x="134" y="550">HUMAN APPROVAL GATE</text>
+    <text class="box-copy" x="134" y="575">Operator reviews before action</text>
   </g>
 
-  <path class="arrow" d="M 340 445 C 390 445, 400 445, 448 445"/>
+  <path class="arrow" d="M 380 445 C 405 445, 420 445, 448 445"/>
 
   <g filter="url(#shadow)">
     <rect x="450" y="230" width="300" height="430" rx="28" fill="url(#agent)" opacity="0.96"/>
