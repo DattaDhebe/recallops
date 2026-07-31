@@ -117,20 +117,20 @@ For exact API and Managed MCP commands, use the root `README.md`.
 
 ## Required links
 
-- Public source repository: `[ADD PUBLIC GITHUB REPOSITORY URL]`
-- Functional public AWS demo: `[ADD PUBLIC HTTPS AWS DEMO URL]`
-- Public YouTube or Vimeo video under three minutes: `[ADD PUBLIC VIDEO URL]`
-- Public MIT license: `[ADD PUBLIC REPOSITORY URL]/blob/main/LICENSE`
+- Public source repository: https://github.com/DattaDhebe/recallops
+- Functional public AWS demo: **Pending live AWS deployment; do not submit until this URL is public and tested.**
+- Public YouTube or Vimeo video under three minutes: **Pending recording; do not submit until the public video is under three minutes.**
+- Public MIT license: https://github.com/DattaDhebe/recallops/blob/codex/hackathon-ready/LICENSE
 
 Do not replace a required URL with localhost, a private dashboard, a screenshot, or a repository-only deployment plan.
 
 ## Suggested gallery assets
 
 - Project cover: `assets/devpost-cover.png`
-- Operator-console screenshot: `[ADD IMAGE]`
+- Operator-console screenshot: **Capture from the deployed app after cloud verification.**
 - Architecture diagram showing both CockroachDB tools and Bedrock: `assets/architecture.png` and `output/pdf/recallops-architecture.pdf`
-- CockroachDB vector-memory evidence screenshot: `[ADD IMAGE]`
-- Managed MCP `select_query` audit screenshot with secrets removed: `[ADD IMAGE]`
+- CockroachDB vector-memory evidence screenshot: **Capture from CockroachDB Cloud after live verification.**
+- Managed MCP `select_query` audit screenshot with secrets removed: **Capture from the deployed investigation after live verification.**
 
 ## Additional information fields
 

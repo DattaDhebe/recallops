@@ -28,10 +28,10 @@ Every item in this section is mandatory.
 - [ ] CockroachDB tool 2: Managed MCP Server is implemented and integrated; it still needs a cluster-scoped read-only service account and live demo proof.
 - [x] AWS service code path: Amazon Bedrock supports Titan embeddings and Nova reasoning.
 - [ ] At least one AWS service is live and demonstrably powers the deployed project.
-- [ ] Public open-source repository contains all code, setup instructions, example configuration, and a root MIT license.
+- [x] Public open-source repository contains all code, setup instructions, example configuration, and a root MIT license.
 - [ ] Free functional demo URL is available to judges until September 15.
 - [ ] Public YouTube or Vimeo demo is under three minutes, shows the project working, and visibly shows the CockroachDB memory layer.
-- [x] Devpost project story names both CockroachDB tools and Amazon Bedrock with their actual agent roles; the required Additional Info selections are drafted but cannot be saved until required entrant fields are complete.
+- [x] Devpost project story names both CockroachDB tools and Amazon Bedrock with their actual agent roles; the saved Additional Info selections identify the same tools and service.
 - [x] Devpost project story names Amazon Bedrock and explains Titan embedding and Nova reasoning roles.
 - [ ] All required Devpost fields, eligibility attestations, and personal details are completed by the entrant.
 
@@ -43,7 +43,7 @@ Do not submit while any mandatory item is unchecked.
 | --- | --- | --- | --- |
 | P0 | Managed MCP is integrated but not live-verified | Automatic Stage One failure if the live demo does not prove it | Configure the read-only service account, exercise the integrated audit against CockroachDB Cloud, and show its receipt in the video |
 | P0 | No verified AWS deployment | The challenge requires deployment on AWS | Public HTTPS endpoint runs the production configuration and passes an end-to-end smoke test |
-| P0 | No public repository or URLs | Required submission deliverable | Public repo, live demo, and root license URLs are added to Devpost |
+| P0 | No live demo or video URLs | Required submission deliverables | Add a public AWS demo URL and a public YouTube/Vimeo video URL to Devpost |
 | P0 | No public demo video | Required submission deliverable | Public YouTube/Vimeo video is under 3:00 and shows vector memory plus MCP audit |
 | Done | Devpost and product naming diverged | Confusing and weakens credibility | Devpost, repository, UI, and generated assets now use RecallOps |
 | Done | Saved Devpost story described a generic planned system | Claims did not match the working product | Project story now describes the implemented incident-response memory loop |
