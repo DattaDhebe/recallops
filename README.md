@@ -6,6 +6,12 @@ RecallOps is an incident-response assistant that turns operator-recorded inciden
 
 This project is being built for the **CockroachDB x AWS Hackathon: Build with Agentic Memory**.
 
+> **Submission-safe status:** The local workflow and integration code are implemented and tested. CockroachDB Cloud, Bedrock, Managed MCP, and AWS hosting still require account credentials and live smoke tests before they can be described as deployed. This repository does not claim a public cloud deployment that has not been verified.
+
+## Why this architecture matters
+
+Incident assistants are only useful when an operator can see why a recommendation was made and what happened the last time. RecallOps makes that evidence boundary explicit: each incident, resolution, and outcome is stored as durable memory; recall is limited to resolved incidents for the same service; the response carries IDs, provenance, relevance, and uncertainty; and a human approval gate remains between the recommendation and any operational action. RecallOps never executes remediation.
+
 ## What is implemented
 
 RecallOps currently includes:
@@ -34,6 +40,7 @@ RecallOps recommends evidence to investigate. It does not execute infrastructure
 | Amazon Bedrock | Titan embedding and Nova reasoning clients implemented | AWS credentials, model access, and a live smoke test |
 | CockroachDB Cloud Managed MCP | Read-only `select_query` audit is integrated into the top recalled recommendation and covered by contract/API tests | Cluster-scoped read-only credentials and a live execution |
 | AWS hosting | Non-root Docker image, CI, and an undeployed ECS Fargate task/IAM template | Render the template, deploy to AWS, expose public HTTPS, and keep it available for judging |
+| Architecture evidence | Source SVG, PNG, and one-page PDF are regenerated from the same reviewed design | Upload the same artifact revision to Devpost after the final deployment check |
 
 There is currently no claimed public deployment. Do not describe ECS, Fargate, an Application Load Balancer, Secrets Manager, or a public demo as live until those resources have actually been created and verified.
 
@@ -41,26 +48,40 @@ There is currently no claimed public deployment. Do not describe ECS, Fargate, a
 
 ```mermaid
 flowchart LR
-    O["Operator"] --> A["FastAPI and operator console"]
-    A --> E{"Embedding provider"}
-    E --> L["Local deterministic hash"]
-    E --> T["Amazon Titan Text Embeddings V2"]
-    A --> D{"Memory store"}
-    D --> S["SQLite development mode"]
-    D --> C["CockroachDB VECTOR(512)"]
-    C --> V["Resolved-only, same-service cosine retrieval"]
-    V --> A
-    V --> M["Managed MCP select_query audit of top memory"]
-    M --> A
-    A --> N["Amazon Nova Lite when enabled"]
-    N --> A
+    O["Operator console<br/>service • symptoms • infrastructure<br/>resolution • outcome"] --> A["RecallOps agent<br/>FastAPI orchestration"]
+    A --> W["Atomic memory write<br/>incident + evidence commit"]
+    W --> D["Durable agent memory<br/>CockroachDB VECTOR(512)<br/>incidents • memory events • ANN"]
+    D --> R["Resolved-only recall<br/>same service • thresholded"]
+    R --> G["Grounded response<br/>evidence IDs + uncertainty"]
+    D --> Q["Managed MCP<br/>read-only select_query audit"]
+    Q --> G
+    A --> B["Amazon Bedrock when enabled<br/>Titan embeddings • Nova Lite"]
+    B --> W
+    B --> G
+    G --> H["Human approval gate<br/>operator approval required<br/>no automatic remediation"]
+    G --> P["Visible proof in every response<br/>relevance • terms • outcome<br/>memory/source IDs • timestamps • MCP status"]
 ```
 
-When Managed MCP is enabled, `/investigate` automatically reads back the top recalled incident's durable memory trail through an allowlisted, bounded `select_query`. The response and browser console expose the per-request tool trace and audit receipt.
+The production path uses CockroachDB Cloud's `VECTOR(512)` memory and Bedrock when enabled. Local development swaps in SQLite and deterministic embeddings without changing the API workflow. When Managed MCP is enabled, `/investigate` automatically reads back the top recalled incident's durable memory trail through an allowlisted, bounded `select_query`; the response and browser console expose the per-request tool trace and audit receipt.
+
+The diagram is maintained as source SVG, a 16:9 PNG, and a one-page PDF so the same reviewed design can be used in the repository, demo, and Devpost submission.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for transaction boundaries, retrieval rules, provenance, safety controls, and failure behavior.
 
-![RecallOps architecture](assets/architecture.svg)
+![RecallOps architecture diagram](assets/architecture.svg)
+
+## Judge-facing proof path
+
+The shortest reproducible demo is:
+
+1. Record a prior incident with service, symptoms, and infrastructure context.
+2. Resolve it with a concrete resolution and observed outcome.
+3. Record a new incident for the same service with similar symptoms.
+4. Investigate and show that recall is resolved-only, same-service, thresholded, and capped at five results.
+5. Show the grounded response, source/memory IDs, provenance, request trace, and (when configured) the Managed MCP audit receipt.
+6. Have the operator review the recommendation; there is no automatic remediation path.
+
+This sequence demonstrates the complete memory loop rather than only a static architecture claim.
 
 ## Requirements
 
@@ -217,13 +238,14 @@ Set `INCIDENT_ID` only for that direct diagnostic. Live verification still requi
 4. When `USE_COCKROACH_MCP=true`, the agent audits the top recalled incident through Managed MCP `select_query` and exposes the result plus a per-request tool trace.
 5. The response includes source incident IDs, relevance, matched terms, the recorded resolution and outcome, and complete memory evidence with provenance.
 6. If relevant matches exist and `USE_BEDROCK=true`, Nova Lite summarizes that evidence with explicit untrusted-data and non-execution guardrails. Otherwise RecallOps returns a deterministic local summary.
-7. `GET /incidents/{id}/memory` exposes the stored evidence trail.
+7. The operator reviews the grounded recommendation. The application has no remediation endpoint and does not execute infrastructure changes.
+8. `GET /incidents/{id}/memory` exposes the stored evidence trail.
 
 Set `API_KEY` to protect every incident read, write, resolution, and investigation route; clients then send it in `X-API-Key`. Health, readiness, system status, and the static operator console remain public for load-balancer checks and judging visibility.
 
 `/health` is a liveness check. `/ready` verifies a database query. `/system` reports selected configuration and the detected backend; configuration alone does not prove that Bedrock or Managed MCP credentials work. The investigation tool trace proves that those calls ran for a request. Every response includes `X-Request-ID`, and the server emits a bounded JSON request-completion or request-failure log without request bodies, query strings, or credentials.
 
-## AWS deployment target, not current status
+## AWS deployment path (not yet claimed as live)
 
 The image can be published to Amazon ECR and run as a stateless ECS Fargate service behind HTTPS. [`infra/aws`](infra/aws) contains an explicit undeployed task-definition template, a least-privilege Bedrock policy, secret-injection guidance, and a production checklist.
 
@@ -235,5 +257,6 @@ Those templates are not evidence that AWS resources exist. Add ECS/Fargate, ALB,
 - [ARCHITECTURE.md](ARCHITECTURE.md) - detailed memory lifecycle, retrieval constraints, MCP safety, and deployment boundaries.
 - [LICENSE](LICENSE) - MIT license.
 - [Devpost cover](assets/devpost-cover.png) - generated 16:9 project gallery asset.
-- [Architecture graphic](assets/architecture.png) - exact tool and memory-flow diagram for web/gallery use.
-- [Architecture PDF](output/pdf/recallops-architecture.pdf) - visually verified Devpost upload artifact.
+- [Architecture source SVG](assets/architecture.svg) - editable source for the reviewed design.
+- [Architecture graphic](assets/architecture.png) - exact 16:9 tool and memory-flow diagram for web/gallery use.
+- [Architecture PDF](output/pdf/recallops-architecture.pdf) - visually verified one-page Devpost upload artifact.
