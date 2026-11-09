@@ -161,7 +161,9 @@ python -m pytest -q
 
 The API tests use an isolated temporary SQLite database. MCP contract tests validate UUID and limit bounds, fixed read-only SQL construction, tool allowlisting, schema adaptation, cluster-scoped headers, and secret redaction without contacting the managed service.
 
-The current suite contains 34 passing tests covering the API workflow, readiness, request tracing, validation, transaction rollback, resolved-only recall, Bedrock evidence propagation, MCP safety, and the integrated MCP audit receipt.
+The suite covers the API workflow, readiness, request tracing, validation, transaction rollback, resolved-only recall, Bedrock evidence propagation, MCP safety, and the integrated MCP audit receipt. Vector tests check dimension and numeric-value validation with SQLite and PostgreSQL dialects; the PostgreSQL checks do not replace a live CockroachDB integration test.
+
+Embeddings must contain exactly 512 finite real numbers. Invalid dimensions, NaN, infinity, booleans, and numeric strings are rejected before storage on both database paths. If a provider returns an invalid vector, the incident or resolution transaction rolls back. Reading malformed embeddings from an older database also raises a validation error; repair or regenerate the affected embeddings before using them for recall. Null embeddings remain supported for legacy records.
 
 ## Local CockroachDB vector stack
 
