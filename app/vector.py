@@ -1,4 +1,6 @@
 import json
+import math
+from numbers import Real
 from typing import Any
 
 from sqlalchemy.types import Text, TypeDecorator, UserDefinedType
@@ -32,11 +34,27 @@ class Vector(TypeDecorator):
     def process_bind_param(self, value: list[float] | None, dialect) -> str | None:
         if value is None:
             return None
-        return json.dumps(value, separators=(",", ":"))
+        return json.dumps(self._validated_values(value), separators=(",", ":"), allow_nan=False)
 
     def process_result_value(self, value: Any, dialect) -> list[float] | None:
         if value is None:
             return None
         if isinstance(value, str):
-            return [float(item) for item in json.loads(value)]
-        return [float(item) for item in value]
+            value = json.loads(value)
+        return self._validated_values(value)
+
+    def _validated_values(self, value: Any) -> list[float]:
+        if not isinstance(value, (list, tuple)) or len(value) != self.dimensions:
+            raise ValueError(f"embedding must contain exactly {self.dimensions} numeric values")
+        values = []
+        for item in value:
+            if isinstance(item, bool) or not isinstance(item, Real):
+                raise ValueError("embedding values must be real numbers")
+            try:
+                number = float(item)
+            except OverflowError as exc:
+                raise ValueError("embedding values must be finite") from exc
+            if not math.isfinite(number):
+                raise ValueError("embedding values must be finite")
+            values.append(number)
+        return values

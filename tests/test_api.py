@@ -6,6 +6,7 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.exc import StatementError
 
 test_directory = Path(tempfile.mkdtemp(prefix="recallops-tests-"))
 os.environ["DATABASE_URL"] = f"sqlite:///{(test_directory / 'test.db').as_posix()}"
@@ -289,6 +290,72 @@ def test_resolve_rolls_back_when_outcome_embedding_fails(
     assert incident.json()["status"] == "open"
     assert incident.json()["resolution"] is None
 
+    memories = client.get(f"/incidents/{incident_id}/memory")
+    assert memories.status_code == 200
+    assert [item["kind"] for item in memories.json()] == ["symptoms"]
+
+
+def test_create_rolls_back_when_embedding_has_wrong_dimensions(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class ShortEmbedder:
+        def embed(self, _: str) -> list[float]:
+            return [1.0] * 511
+
+    monkeypatch.setattr(memory_module, "get_embedder", lambda _: ShortEmbedder())
+
+    with pytest.raises(StatementError, match="exactly 512"):
+        client.post(
+            "/incidents",
+            json={
+                "title": "Malformed embedding must not be stored",
+                "service": "embedding-validation-create",
+                "symptoms": "Reject a provider response with the wrong embedding dimensions",
+            },
+        )
+
+    incidents = client.get("/incidents")
+    assert incidents.status_code == 200
+    assert all(item["service"] != "embedding-validation-create" for item in incidents.json())
+
+
+def test_resolve_rolls_back_when_outcome_embedding_is_nonfinite(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    created = client.post(
+        "/incidents",
+        json={
+            "title": "Reject invalid outcome embedding",
+            "service": "embedding-validation-resolve",
+            "symptoms": "Keep the original incident state if the provider returns NaN",
+        },
+    )
+    assert created.status_code == 201
+    incident_id = created.json()["id"]
+
+    class InvalidSecondEmbedding:
+        calls = 0
+
+        def embed(self, _: str) -> list[float]:
+            self.calls += 1
+            return [float("nan") if self.calls == 2 else 1.0] * 512
+
+    embedder = InvalidSecondEmbedding()
+    monkeypatch.setattr(memory_module, "get_embedder", lambda _: embedder)
+
+    with pytest.raises(StatementError, match="must be finite"):
+        client.post(
+            f"/incidents/{incident_id}/resolve",
+            json={
+                "resolution": "This resolution must roll back",
+                "outcome": "This invalid outcome must roll back",
+            },
+        )
+
+    incident = client.get(f"/incidents/{incident_id}")
+    assert incident.status_code == 200
+    assert incident.json()["status"] == "open"
+    assert incident.json()["resolution"] is None
     memories = client.get(f"/incidents/{incident_id}/memory")
     assert memories.status_code == 200
     assert [item["kind"] for item in memories.json()] == ["symptoms"]
