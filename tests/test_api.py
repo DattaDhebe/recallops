@@ -352,3 +352,75 @@ def test_bedrock_reasoner_receives_outcome_evidence(
     outcome_evidence = next(item for item in recommendation["evidence"] if item["kind"] == "outcome")
     assert outcome_evidence["incident_id"] == source_incident_id
     assert outcome_evidence["metadata_json"]["notes"] == "Observed for twenty minutes"
+
+
+@pytest.mark.parametrize("use_bedrock", [False, True], ids=["local", "bedrock"])
+@pytest.mark.parametrize("has_matches", [False, True], ids=["no-matches", "matches"])
+def test_reasoning_trace_reflects_actual_provider(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+    use_bedrock: bool,
+    has_matches: bool,
+) -> None:
+    # Seed evidence offline, then select the reasoning provider independently.
+    monkeypatch.setattr(main_module.settings, "use_bedrock", False)
+    monkeypatch.setattr(main_module.settings, "use_cockroach_mcp", False)
+    service = f"reasoning-trace-{use_bedrock}-{has_matches}"
+    incident_payload = {
+        "title": "Database connection saturation",
+        "service": service,
+        "symptoms": "Database connections are saturated and requests time out",
+    }
+    if has_matches:
+        source = client.post("/incidents", json=incident_payload)
+        assert source.status_code == 201
+        resolved = client.post(
+            f"/incidents/{source.json()['id']}/resolve",
+            json={
+                "resolution": "Reduced worker concurrency",
+                "outcome": "Connection utilization returned to baseline",
+            },
+        )
+        assert resolved.status_code == 200
+    current = client.post("/incidents", json=incident_payload)
+    assert current.status_code == 201
+
+    reasoner_calls: list[str] = []
+
+    class TrackingReasoner:
+        def __init__(self, _):
+            reasoner_calls.append("initialized")
+
+        def summarize(self, incident_title: str, symptoms: str, recommendations: list[dict]) -> str:
+            assert recommendations
+            reasoner_calls.append("summarized")
+            return "Grounded Bedrock summary"
+
+    monkeypatch.setattr(agent_module, "BedrockReasoner", TrackingReasoner)
+    monkeypatch.setattr(main_module.settings, "use_bedrock", use_bedrock)
+
+    response = client.post(f"/incidents/{current.json()['id']}/investigate")
+    assert response.status_code == 200
+    payload = response.json()
+    assert bool(payload["recommendations"]) is has_matches
+    trace = {item["name"]: item for item in payload["tools_used"]}
+
+    if use_bedrock and has_matches:
+        assert reasoner_calls == ["initialized", "summarized"]
+        assert payload["provider"] == "amazon-bedrock"
+        assert payload["summary"] == "Grounded Bedrock summary"
+        assert trace["amazon-bedrock"]["status"] == "used"
+        assert trace["amazon-bedrock"]["detail"] == main_module.settings.bedrock_model_id
+        assert "local-summary-fallback" not in trace
+    else:
+        assert reasoner_calls == []
+        assert payload["provider"] == "local-retrieval"
+        assert trace["local-summary-fallback"]["status"] == "fallback"
+        assert trace["local-summary-fallback"]["detail"] is None
+        if use_bedrock:
+            assert trace["amazon-bedrock"]["status"] == "skipped"
+            assert trace["amazon-bedrock"]["detail"] == (
+                "No recalled recommendation required a Bedrock summary"
+            )
+        else:
+            assert "amazon-bedrock" not in trace

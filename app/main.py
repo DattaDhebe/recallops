@@ -305,12 +305,22 @@ async def investigate_incident(
             }
         )
 
+    bedrock_used = result["provider"] == "amazon-bedrock"
+    if settings.use_bedrock and not bedrock_used:
+        result["tools_used"].append(
+            {
+                "name": "amazon-bedrock",
+                "purpose": "Summarize grounded recommendations without executing changes",
+                "status": "skipped",
+                "detail": "No recalled recommendation required a Bedrock summary",
+            }
+        )
     result["tools_used"].append(
         {
-            "name": "amazon-bedrock" if settings.use_bedrock else "local-summary-fallback",
+            "name": "amazon-bedrock" if bedrock_used else "local-summary-fallback",
             "purpose": "Summarize grounded recommendations without executing changes",
-            "status": "used" if settings.use_bedrock else "fallback",
-            "detail": settings.bedrock_model_id if settings.use_bedrock else None,
+            "status": "used" if bedrock_used else "fallback",
+            "detail": settings.bedrock_model_id if bedrock_used else None,
         }
     )
     return result
